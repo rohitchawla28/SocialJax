@@ -36,8 +36,8 @@
 
 
 # WandB Params
-"ENTITY": ""
-"PROJECT": "socialjax"
+"ENTITY": "rohit-chawla28"
+"PROJECT": "socialjax-ippo"
 "WANDB_MODE" : "online"
 "WANDB_TAGS":
   - INDIVIDUAL_REWARD # COMMON_REWARD; INDIVIDUAL_REWARD    --only worked for the name of wandb.

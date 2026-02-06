@@ -32,8 +32,8 @@
 "GIF_NUM_FRAMES": 250
 
 # WandB Params
-"ENTITY": ""
-"PROJECT": "socialjax"
+"ENTITY": "rohit-chawla28"
+"PROJECT": "socialjax-mappo"
 "WANDB_MODE" : "online"
 "WANDB_TAGS":
   - COMMON_REWARD # COMMON_REWARD
