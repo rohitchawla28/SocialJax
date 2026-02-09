@@ -32,11 +32,14 @@ export XDG_CACHE_HOME="$BASE/.cache"
 mkdir -p "$PIP_CACHE_DIR" "$XDG_CACHE_HOME"
 
 # install dependencies
-pip install -r requirements.txt
-pip install jaxlib==0.4.23+cuda11.cudnn86 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+# pip install -r requirements.txt
+conda run -n SocialJax python -m pip install -r requirements.txt
+
+# pip install jaxlib==0.4.23+cuda11.cudnn86 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+conda run -n SocialJax python -m pip install jaxlib==0.4.23+cuda11.cudnn86 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 
 # sanity checks
-python - <<'PY'
+conda run -n SocialJax python - <<'PY'
 import jax, jaxlib
 print("jax:", jax.__version__)
 print("jaxlib:", jaxlib.__version__)
