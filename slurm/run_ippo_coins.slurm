@@ -5,6 +5,7 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -t 08:00:00
+##SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -o /scratch/11264/rohitchawla28/scr_reproduce_socialjax/slurm/logs/ippo_coins.%j.out
 #SBATCH -e /scratch/11264/rohitchawla28/scr_reproduce_socialjax/slurm/logs/ippo_coins.%j.err
 
