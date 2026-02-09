@@ -2,7 +2,7 @@
 Based on PureJaxRL & jaxmarl Implementation of PPO
 """
 import sys
-sys.path.append('/home/shuqing/SocialJax')
+# sys.path.append('/home/shuqing/SocialJax') # ***CHECK
 import jax
 import jax.numpy as jnp
 import flax.linen as nn
@@ -13,7 +13,7 @@ from typing import Sequence, NamedTuple, Any
 from flax.training.train_state import TrainState
 # from flax.training import checkpoints
 import distrax
-from gymnax.wrappers.purerl import LogWrapper, FlattenObservationWrapper
+from gymnax.wrappers.purerl import LogWrapper, FlattenObservationWrapper # ***CHECK
 import socialjax
 from socialjax.wrappers.baselines import LogWrapper, SVOLogWrapper
 import hydra
@@ -181,7 +181,7 @@ def make_train(config):
         config["NUM_ACTORS"] * config["NUM_STEPS"] // config["NUM_MINIBATCHES"]
     )
 
-    env = LogWrapper(env, replace_info=False)
+    env = LogWrapper(env, replace_info=False) # ***CHECK
 
     rew_shaping_anneal = optax.linear_schedule(
         init_value=0.,
@@ -548,18 +548,18 @@ def single_run(config):
     print("** Saving Results **")
     filename = f'{config["ENV_NAME"]}_seed{config["SEED"]}'
     train_state = jax.tree_map(lambda x: x[0], out["runner_state"][0])
-    save_path = f"./checkpoints/individual/{filename}.pkl"
+    save_path = f"./checkpoints/individual/{filename}.pkl"                  # ***CHECK
     if config["PARAMETER_SHARING"]:
-        save_path = f"./checkpoints/indvidual/{filename}.pkl"
+        save_path = f"./checkpoints/individual/{filename}.pkl"              # ***CHECK
         save_params(train_state, save_path)
         params = load_params(save_path)
     else:
         params = []
         for i in range(config['ENV_KWARGS']['num_agents']):
-            save_path = f"./checkpoints/individual/{filename}_{i}.pkl"
+            save_path = f"./checkpoints/individual/{filename}_{i}.pkl"         # ***CHECK
             save_params(train_state[i], save_path)
             params.append(load_params(save_path))
-    evaluate(params, socialjax.make(config["ENV_NAME"], **config["ENV_KWARGS"]), save_path, config)
+    evaluate(params, socialjax.make(config["ENV_NAME"], **config["ENV_KWARGS"]), save_path, config)     # ***CHECK
     # state_seq = get_rollout(train_state.params, config)
     # viz = OvercookedVisualizer()
     # agent_view_size is hardcoded as it determines the padding around the layout.
@@ -587,9 +587,9 @@ def evaluate(params, env, save_path, config):
     pics = []
     img = env.render(state)
     pics.append(img)
-    root_dir = f"evaluation/coins"
-    path = Path(root_dir + "/state_pics")
-    path.mkdir(parents=True, exist_ok=True)
+    root_dir = f"evaluation/coins"              # ***CHECK
+    path = Path(root_dir + "/state_pics")       # ***CHECK
+    path.mkdir(parents=True, exist_ok=True)     # ***CHECK
 
     for o_t in range(config["GIF_NUM_FRAMES"]):
         # 获取所有智能体的观察
@@ -629,18 +629,20 @@ def evaluate(params, env, save_path, config):
         img = env.render(state)
         pics.append(img)
         
-        print('###################')
-        print(f'Actions: {env_act}')
-        print(f'Reward: {reward}')
-        # print(f'State: {state.agent_locs}')
-        # print(f'State: {state.claimed_indicator_time_matrix}')
-        print("###################")
+        # added to reduce prints
+        if o_t % 10 == 0:
+            print('###################')
+            print(f'Actions: {env_act}')
+            print(f'Reward: {reward}')
+            # print(f'State: {state.agent_locs}')
+            # print(f'State: {state.claimed_indicator_time_matrix}')
+            print("###################")
     
     # 保存GIF
     print(f"Saving Episode GIF")
     pics = [Image.fromarray(np.array(img)) for img in pics]
     n_agents = len(env.agents)
-    gif_path = f"{root_dir}/{n_agents}-agents_seed-{config['SEED']}_frames-{o_t + 1}.gif"
+    gif_path = f"{root_dir}/{n_agents}-agents_seed-{config['SEED']}_frames-{o_t + 1}.gif"       # ***CHECK
     pics[0].save(
         gif_path,
         format="GIF",
