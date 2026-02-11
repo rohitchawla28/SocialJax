@@ -5,24 +5,27 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH --cpus-per-task=2               # good for runtime orchestration?
-#SBATCH --gpus=1
 #SBATCH -t 00:05:00
 #SBATCH -o /scratch/11264/rohitchawla28/scr_reproduce_socialjax/slurm/logs/cuda_test2.%j.out
 #SBATCH -e /scratch/11264/rohitchawla28/scr_reproduce_socialjax/slurm/logs/cuda_test2.%j.err
 
-# restart environment modules
+# clears any inherited modules so we are at clean slate
+# doesn't affect modules globally, just for this job
 module reset
 
+unset LD_LIBRARY_PATH
+
 # load cuda 12 module
-module load cuda/12.2
+# module load cuda/12.2     # commented out to try just using the pip provided CUDA lib
 
 # check cuda version, || true b/c some CUDA modules provide runtime libraries without nvcc which is fine for JAX
-nvcc --version || true
+# nvcc --version || true
 
-# so that conda is found
+# so that conda executable is found
 export PATH="/scratch/11264/rohitchawla28/scr_reproduce_socialjax/miniforge3/bin:$PATH"
 
 # install jax with cuda 12 support
+# removed b/c don't need to reinstall each time
 conda run -n SocialJax python -m pip uninstall -y jax jaxlib
 conda run -n SocialJax python -m pip install -U "jax[cuda12]"
 
@@ -31,6 +34,8 @@ nvidia-smi
 
 # check  visibility
 echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
+
+echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-<unset>}"
 
 # test
 conda run -n SocialJax python -c "import jax; print(jax.devices())"

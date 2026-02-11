@@ -629,7 +629,8 @@ def evaluate(params, env, save_path, config):
         img = env.render(state)
         pics.append(img)
         
-        # added to reduce prints
+        # i added to reduce prints, 250 -> 25
+        # TODO: prob log in WandB instead of printing
         if o_t % 10 == 0:
             print('###################')
             print(f'Actions: {env_act}')

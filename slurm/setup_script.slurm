@@ -21,9 +21,11 @@ source "$MINIFORGE/etc/profile.d/conda.sh"
 conda activate SocialJax
 
 # run from repo root so relative imports + relative output dirs work
+# key thing is that it still finds socialjax package inside the REPO
 cd "$REPO"
 
-# added this because PYTHONPATH currently set so it might mess up imports
+# added this because PYTHONPATH currently set to python 3.9.7 site-packages on lonestar6 so it might mess up imports
+# unsetting it inside the job doesn't change it globally
 unset PYTHONPATH
 
 # make sure no cache data going on $HOME
