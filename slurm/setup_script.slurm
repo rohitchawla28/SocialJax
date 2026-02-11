@@ -4,6 +4,7 @@
 #SBATCH -p gpu-a100
 #SBATCH -N 1
 #SBATCH -n 1
+#SBATCH --cpus-per-task=2               # good for runtime orchestration?
 #SBATCH -t 01:00:00
 #SBATCH -o /scratch/11264/rohitchawla28/scr_reproduce_socialjax/slurm/logs/setup.%j.out
 #SBATCH -e /scratch/11264/rohitchawla28/scr_reproduce_socialjax/slurm/logs/setup.%j.err
@@ -15,13 +16,16 @@ BASE="/scratch/11264/rohitchawla28/scr_reproduce_socialjax"
 REPO="$BASE/SocialJax"
 MINIFORGE="$BASE/miniforge3"
 
+module reset
+unset LD_LIBRARY_PATH
+
 # conda
 export PATH="$MINIFORGE/bin:$PATH"
 source "$MINIFORGE/etc/profile.d/conda.sh"
-conda activate SocialJax
+conda activate SocialJax    # do i actually need this still? Because conda activate was being flaky, so i switched to conda run
 
 # run from repo root so relative imports + relative output dirs work
-# key thing is that it still finds socialjax package inside the REPO
+# key thing is that it still finds "socialjax" package inside the REPO
 cd "$REPO"
 
 # added this because PYTHONPATH currently set to python 3.9.7 site-packages on lonestar6 so it might mess up imports
@@ -33,17 +37,13 @@ export PIP_CACHE_DIR="$BASE/.pip_cache"
 export XDG_CACHE_HOME="$BASE/.cache"
 mkdir -p "$PIP_CACHE_DIR" "$XDG_CACHE_HOME"
 
-# install dependencies
-# pip install -r requirements.txt
+# install dependencies (also switched to conda run b/c was being flaky before)
 conda run -n SocialJax python -m pip install -r requirements.txt
 
-# pip install jaxlib==0.4.23+cuda11.cudnn86 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-conda run -n SocialJax python -m pip install jaxlib==0.4.23+cuda11.cudnn86 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+# install CUDA12-enabled JAX (socialJax used CUDA11-enabled version)
+conda run -n SocialJax python -m pip install -U "jax[cuda12]"
 
-# sanity checks
-conda run -n SocialJax python - <<'PY'
-import jax, jaxlib
-print("jax:", jax.__version__)
-print("jaxlib:", jaxlib.__version__)
-print("devices:", jax.devices())
-PY
+# final checks
+nvidia-smi
+echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-<unset>}"
+conda run -n SocialJax python -c "import jax; print('jax', jax.__version__); print(jax.devices())"
